@@ -18,10 +18,10 @@ function rssEmpty = SubFunc_Compute_Vacant_Data(dataForUse, numNodes)
             if n==0
                 rssEmpty(nodeIndex,i)=0;
             else
-                rssEmpty(nodeIndex,i)=sum(a)/n;
+                rssEmpty(nodeIndex,i)=sum(a)/n;%average value.@wudan
             end
         end
     end
     
-    rssEmpty = (rssEmpty + rssEmpty') / 2;
+    rssEmpty = (rssEmpty + rssEmpty') / 2;%a 24*24 matrix.@wudan
 end

@@ -1,15 +1,15 @@
 function [particle_s] = Alg_Compute_Dynamic(particle_s,settings)
 
 
-% The dynamic model, or transition model, this function is to add a dynamic
+% The dynamic model, or transition model, this function is to add a 'dynamic'
 % to the particle location, it is like adding a possible location according to the previous estimated location  
 
 
 Nobj = settings.Nobj;
 
 
-% Random Walk
-if strcmp(settings.propagation_type,'RW')
+% Random Walk(present used model)
+if strcmp(settings.propagation_type,'RW')%RW refers to Random Walk.@wudan
     sigma_x = settings.sigmax;
     sigma_y = settings.sigmay;
     sigma_xyv = repmat([sigma_x sigma_y],1,Nobj);
@@ -24,7 +24,7 @@ end
 
 
 
-% JSMM,   We don't use it right now
+% JSMM,  We don't use it right now
 if strcmp(settings.propagation_type,'JSMM')
 
     previousParticles = particle_s.prev_time_particles';
@@ -60,7 +60,6 @@ if strcmp(settings.propagation_type,'JSMM')
         currentParticles(2*i-1:2*i,:) = previousParticles(2*i-1:2*i,:) + settings.m * [cos(currentTheta(i,:));sin(currentTheta(i,:))] + sigma_v*randn(size(previousParticles(2*i-1:2*i,:)));
     end
 
-    
     particle_s.thetaThisRound = currentTheta;
     particle_s.UThisRound = currentU;
     particle_s.curr_time_particles = currentParticles';

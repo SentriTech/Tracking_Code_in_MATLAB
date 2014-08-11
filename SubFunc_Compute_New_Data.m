@@ -21,6 +21,17 @@ function rssAverage = SubFunc_Compute_New_Data(dataForUse, numNodes, rssEmpty)
         end
     end
     
+	%the following code are added to eliminate 0 
+	%@wudan.
+	[syme_row,syme_column] = find(rssAverageAcrossTime == 0);
+	syme_temp = (syme_row==syme_column);
+	syme_row(syme_temp) = [];
+	syme_column(syme_temp) = [];
+	syme_zero_num = length(syme_row);
+	for j=1:syme_zero_num
+		rssAverageAcrossTime(syme_row(j),syme_column(j)) = rssAverageAcrossTime(syme_column(j),syme_row(j));
+	end
+	
     %if the transmitted data of one node is missing for two consecutive times, we use the data of the node as the receiving end, to measure
     %each link, which can't be missing since every row has 28 columns of data.
     for nodeIndex = 1:numNodes

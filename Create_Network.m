@@ -6,7 +6,7 @@ function [sensor_network] = Create_Network(settings)
 
 % Constants
 N = settings.numNodes;
-M = (N*(N-1))/2; %num_links
+M = (N*(N-1))/2; %num_links()
 
 % sensor locations
 sensor_pos = settings.sensor_pos;
@@ -23,7 +23,7 @@ d = zeros(M,1);
 for ii = 1 : M
     s1_pos = sensor_pos(links(ii,1),:);
     s2_pos = sensor_pos(links(ii,2),:);
-    d(ii) = norm(s1_pos - s2_pos);
+    d(ii) = norm(s1_pos - s2_pos);%distance of each link.@wudan
 end;
 
 % output structure

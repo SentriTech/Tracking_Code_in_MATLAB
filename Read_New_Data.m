@@ -3,10 +3,10 @@ function [observation n_count fileName startRow] = Read_New_Data(data_file_strin
 % This function is to read and process new coming data from wireless sensor network, in
 % real time.  
 
-n_count = settings.n_count;
+n_count = settings.n_count;%counting data block.@wudan
 fileName = settings.fileName;
 startRow = settings.startRow;
-numNodes = settings.numNodes;
+numNodes = settings.numNodes;%24 nodes
 
 if n_count == 0
     Allname=struct2cell(dir); 
@@ -15,7 +15,7 @@ if n_count == 0
     for i=3:n
         name=Allname{1,i}; 
 
-        if isempty(strfind(name, data_file_string))
+        if isempty(strfind(name,data_file_string))
             continue;
         end
 
@@ -31,7 +31,7 @@ end
 
 blockLength = numNodes;
 
-linkIndex = find(tril(ones(numNodes), -1));
+linkIndex = find(tril(ones(numNodes), -1));%obtain the index of lower left quarter element.@wudan
 linkAverage = settings.rssEmpty(linkIndex);
 linkAverage(linkAverage > 127) = linkAverage(linkAverage > 127) - 2^8;
 
@@ -42,11 +42,11 @@ while(wait_for_data)
         %dataFile = csvread(fileName,startRow,0,[startRow 0 endRow 28]);
         %dataFile = csvread(fileName,0,0,[0 0 blockLength blockLength+4]);
         dataFile = csvread(fileName);
-        dataFile(sum(dataFile,2)==0,:) = [];
-        if size(dataFile,1) < blockLength
+        dataFile(sum(dataFile,2)==0,:) = [];%sum along row,and then ???.@wudan
+        if size(dataFile,1) < blockLength%total number of row.@wudan
             wait_for_data = 1;
         else
-            dataFile = dataFile(2:blockLength+1,:);
+            dataFile = dataFile(startRow:endRow,:);%changed '2:blockLength+1' into 'startRow:endRow'.@wudan
             wait_for_data = 0;
         end
     catch exception
@@ -63,6 +63,8 @@ linkMeasured = rssMeasured(linkIndex);
 linkMeasured(linkMeasured > 127) = linkMeasured(linkMeasured > 127) - 2^8;
 %deltaY = linkAverage - linkMeasured;
 deltaY = abs(linkAverage - linkMeasured);
+%???.@wudan
+%if rssi changes too much , then set it to be unchanged.@wudan
 deltaY(deltaY>20) = 0;
 deltaY(deltaY<-5) = 0;
 observation = deltaY;

@@ -8,11 +8,11 @@ function abnormalLink=SubFunc_Identify_Risky_Links(Data,numNodes,threshold)
 
 temp=zeros(numNodes,numNodes); %to save one full-block data
 NumOfLink=(numNodes*(numNodes-1))/2;
-LinkValue=cell(1,NumOfLink); %to save each link's all value over time
+LinkValue=cell(1,NumOfLink); %to save each link's 'all' value over time
 LinkIndex = find(tril(ones(numNodes), -1));
 
 BlockIndex=find(Data(:,1)==1); % use ID=1 to divide the data into several blocks
-N=length(BlockIndex)-1; % number of block
+N=length(BlockIndex)-1; % number of block(data package)
 
 for i=1:N
     startLine=BlockIndex(i);
@@ -23,18 +23,18 @@ for i=1:N
     % if number of line in a block is larger than numNodes, then discard
     % this block data
     if NumOfLine>numNodes 
-        continue;
+        continue;%pass the control into next iteration-(n+1)th interation.@wudan
     end
       
     % if NumOfLine<=numNodes, then reorganize the RSS data into the 'temp'
-    % Matrix, let the lost line to be zero
+    % Matrix, let the lost line to be 'zero'.
      for ID=1:numNodes
           group=find(block(:,1)==ID);
           if isempty(group)
-              continue;
+              continue;%when it hasn't particular node data.@wudan
           end
           if length(group)>1
-              continue;
+              continue;%when it has one more node data.@wudan
           end
           temp(ID,:)=block(group,2:numNodes+1);
      end
@@ -68,9 +68,9 @@ end
 % calculate variance for each link
 VData=zeros(1,NumOfLink);
 for i=1:NumOfLink
-    VData(1,i)=var(LinkValue{1,i});
+    VData(1,i)=var(LinkValue{1,i});%unbiased variance estimation.@wudan
 end
 
-abnormalLink=find(VData>threshold);
+abnormalLink=find(VData>threshold);%obtain the index of abnormal links
 
 end

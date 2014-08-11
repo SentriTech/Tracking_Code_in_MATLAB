@@ -1,16 +1,16 @@
 function [output_x] = Alg_Main(sensor_network,data_file_string,settings)
 
 
-% Multiple Particle Filtering,   this is the main tracking algorithm 
+% Multiple Particle Filtering,this is the main tracking algorithm 
 
 try 
-tic;
+tic;%start a stopwatch timer.@wudan
 stream = RandStream('mt19937ar','seed',1);
 RandStream.setGlobalStream(stream);
 
 % some constants
-Nobj = settings.Nobj;
-nParticles = settings.Np_obj;
+Nobj = settings.Nobj;%number of object.@wudan
+nParticles = settings.Np_obj;%number of particle.@wudan
 settings.nParticles = nParticles;
 x_dim = 2*Nobj;
 nTime = settings.K;
@@ -32,7 +32,7 @@ settings.n_count = 0;
 settings.startRow = 1;
 settings.fileName = '';
 figure; grid on; hold on;
-plot(sensor_network.sensor_pos(:,1),sensor_network.sensor_pos(:,2),'kx','MarkerSize',15);
+plot(sensor_network.sensor_pos(:,1),sensor_network.sensor_pos(:,2),'kx','MarkerSize',15);%plot 24 node in the graph.@wudan
 % propagate the posterior
 for iTime = 1:nTime
     count_time = count_time+1;
@@ -41,25 +41,27 @@ for iTime = 1:nTime
     observation(settings.abnormalLink,:) = [];
 
     %particle propagation
-    particle_s = Alg_Compute_Dynamic(particle_s,settings);
+    particle_s = Alg_Compute_Dynamic(particle_s,settings);%dynamic model.@wudan
 
     % predictive estimates
-    yp = ones(1,x_dim);
+    yp = ones(1,x_dim);%x_dim equal to 2*N_obj
     for i = 1:Nobj
         yp(2*(i-1)+1:2*(i-1)+2) = particle_s.prev_particle_weights(:,i)'*particle_s.curr_time_particles(:,2*(i-1)+1:2*(i-1)+2);
     end
     % update weights
     for i = 1:Nobj
         y = repmat(yp,nParticles,1);
-        y(:,2*(i-1)+1:2*(i-1)+2) = particle_s.curr_time_particles(:,2*(i-1)+1:2*(i-1)+2);
-        particle_s.curr_particle_weights(:,i) = Alg_Compute_Likelihood(y,observation,settings,sensor_network); % log likelihoods
+        y(:,2*(i-1)+1:2*(i-1)+2) = particle_s.curr_time_particles(:,2*(i-1)+1:2*(i-1)+2);%just change the particle of one person.@wudan
+        particle_s.curr_particle_weights(:,i) = Alg_Compute_Likelihood(y,observation,settings,sensor_network); % log likelihoods of i-th object.@wudan
     end
 
     % normalize the weights to sum to one
     particle_s.curr_particle_weights = bsxfun(@minus,particle_s.curr_particle_weights,(max(max(particle_s.curr_particle_weights))));
     particle_s.curr_particle_weights = exp(particle_s.curr_particle_weights);
     particle_s.curr_particle_weights = bsxfun(@rdivide,particle_s.curr_particle_weights,sum(particle_s.curr_particle_weights,1));
-
+	%/\
+	%|| @rdivide refers to right array divide.@wudan
+	
     % resample particles
     for i = 1:Nobj
         [outIndex] = Alg_Resampling(nParticles,particle_s.curr_particle_weights(:,i),'stratified');
@@ -77,9 +79,9 @@ for iTime = 1:nTime
     x(count_time,:,:) = particle_s.curr_time_particles;
     x_weight(count_time,:,:) = particle_s.curr_particle_weights;
     
-    % plot target location
+    % plot target location(the centre of particle.@wudan)
     particle_center = particle_s.curr_particle_weights'*particle_s.curr_time_particles;
-    color = ['r' 'b' 'k'];
+    color = ['r' 'b' 'k'];%3 colour to identify 3 object(person).@wudan
     clf; hold on; grid on;
     plot(sensor_network.sensor_pos(:,1),sensor_network.sensor_pos(:,2),'kx','MarkerSize',15);
     for i = 1:Nobj
@@ -87,6 +89,7 @@ for iTime = 1:nTime
     end
     axis([0 settings.Lx 0 settings.Ly]);
     pause(0.01);
+	%pause(0.8);%changed @wudan
     
 end % end the for loop of time
 

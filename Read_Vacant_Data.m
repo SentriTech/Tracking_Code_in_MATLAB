@@ -1,6 +1,6 @@
 function [rssEmpty abnormalLink] = Read_Vacant_Data(vacantFile_string, settings)
 
-% This funcion is for vacant network data pre-processing use only.  It
+% This function is for vacant network data pre-processing use only.  It
 % returns a rssEmpty matrix which will be used as the standard matrix when
 % sensing the vacant network.   It also returns abnormalLink which identify
 % those links with a higher strange variance, they may be affected by the
@@ -9,7 +9,7 @@ function [rssEmpty abnormalLink] = Read_Vacant_Data(vacantFile_string, settings)
 
 threshold  = settings.vacantThreshold;
 numNodes = settings.numNodes;
-vacantSensingTime = settings.vacantSensingTime;
+vacantSensingTime = settings.vacantSensingTime;%working time of wireless network.@wudan
 ignoreLine = settings.ignoreLine;
 
 
@@ -33,7 +33,7 @@ vacantNetworkInitialSecond = vacnatNetworkTimeStamps(1);
 vacantNetworkLastSecond = vacnatNetworkTimeStamps(1) + vacantSensingTime;
 
 
-% Define the first and last indice of the start line and the end line in the data matrix
+% Define the first and last indices of the start line and the end line in the data matrix
 vacantNetworkStartIndice = find(vacnatNetworkTimeStamps > vacantNetworkInitialSecond, 1, 'first');
 if vacantNetworkLastSecond > vacnatNetworkTimeStamps(end)     % If the vacnt data is too short, shorter than the pre-defined  'vacantNetworkSeconds', then set the end of the file as the last index
     vacantNetworkLastSecond = vacnatNetworkTimeStamps(end);

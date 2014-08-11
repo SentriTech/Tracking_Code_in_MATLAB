@@ -1,17 +1,16 @@
-
 clearvars;
 close all;
 
 % read data for vacant network
 
-% load parameter settings    
+% load parameter settings(structure )    
 settings = Load_Settings();                                                
 
 % Pre-processing of the data of sensing the vacant network
-vacantFile_string =  'Empty.csv';
+vacantFile_string =  'empty.csv';
 [rssEmpty abnormalLink] = Read_Vacant_Data(vacantFile_string, settings);
 
-% ‘rssEmpty’ is a matrix describe the vacant network, 
+%'rssEmpty' is a matrix describe the vacant network, 
 %'abnormalLink' is to identify unreliable links  
 % Here is to add these two terms to the 'setting' structure
 settings.rssEmpty = rssEmpty;
