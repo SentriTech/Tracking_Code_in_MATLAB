@@ -1,0 +1,7 @@
+1.MFC Program Catch time are used for read computer system time when you click the button, time are
+stored into 'SystemTime_Out.txt',but for better to be readed by MATLAB,we copy the time in it into 
+'catchTime.csv' .
+
+2.'data.csv' file contains RSSI data of human walking through 16 point in node area.
+
+3.Please use newest code version,such as 'preProcess_v1_1.m'.
