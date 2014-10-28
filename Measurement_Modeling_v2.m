@@ -1,7 +1,7 @@
 clear;close;clc;
-%unvalidated fully-2014.08.14 version
-%unadjusted parament :step, 
-%the aim of this script is to modeling measuerment model, or we can say to obtain 3 parameter:PHI, sigma_lamda and sigma_z
+%the aim of this script is to modeling measuerment model, 
+%or we can say to obtain 3 parameter:PHI, sigma_lamda and sigma_z
+%adjustable parament :step, 
 %Step 1:Load settings.
 settings = Load_Settings();                                                
 
@@ -12,7 +12,7 @@ vacantFile_string = 'empty.csv';
 
 settings.rssEmpty = rssEmpty;
 settings.abnormalLink = abnormalLink;
-%Step 3:Read rss data with human stand in differant points.
+%Step 3:Read rss data with a person walking through each reference points.
 %Obtain rssObstruct
 Point_pos = settings.human_pos;
 [Point_num,~] = size((settings.human_pos));
@@ -20,7 +20,6 @@ rssObstruct = zeros(settings.numNodes,settings.numNodes,Point_num);%Initialize r
 
 Allname=struct2cell(dir); 
 [~,n] = size(Allname);
-
 for j = 1:Point_num
 	data_file_string = num2str(j);
 	csvFilesNameIndex = [];
@@ -37,7 +36,7 @@ for j = 1:Point_num
 	[rssObstruct(:,:,j),~] = Read_Vacant_Data(fileName,settings);
 end
 
-%Step 4:caculate lamda and Z(attenuation).
+%Step 4:Caculate lamda and Z(attenuation).
 lamda = [];
 Z = [];
 sensor_network = Create_Network(settings);
@@ -76,7 +75,7 @@ end
 %Here we divide lamda evenly into L segments, because it makes the following caculation easier
 % and it almost have no influence on final results. 
 % step = (lamda_standard(L+1)-lamda_standard(L))/2
-step = 0.03;%step size should be choose carefully, here we choose 10 cetimeter
+step = 0.03;%step size should be choose carefully(unit:meter)
 lamda_standard = 0:step:1;
 L = length(lamda_standard);
 Z_standard = zeros(1,L);
@@ -91,12 +90,12 @@ end
 temp = find(Z_standard==0);%find zero part of Z_standard and eliminate it
 lamda_standard(temp) = [];
 Z_standard(temp) = [];
-%Step 6:Fitting the exponential curve
+%Step 6:Fitting the exponential curve,actually,i just manually do this
 plot(lamda_standard,Z_standard,'r-')
 xlabel('Lamda')
 ylabel('Attenuation')
-phi = 1.8;sigma_lamda = 0.03;
+phi = 1.8;sigma_lamda = 0.03;%Please replace these 2 parameter with fitted parameter.
 hold on
 plot(lamda_standard,phi*exp(-lamda_standard/(2*sigma_lamda)))
 diff = Z_standard - phi*exp(-lamda_standard/(2*sigma_lamda));
-sqrt(var(diff))
+sqrt(var(diff))%this is actually sigma_z
