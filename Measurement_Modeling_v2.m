@@ -53,12 +53,12 @@ linksDistances = sensor_network.d;
 s1_location = sensor_network.sensor_pos(sensor_network.links(:,1),:);%transmitte node position of each link
 s2_location = sensor_network.sensor_pos(sensor_network.links(:,2),:);%receive node position of each link.@wudan
 for i = 1:Point_num
-    diff1 = bsxfun(@minus,s1_location(:,1),Point_pos(Point_num,1));
-    diff2 = bsxfun(@minus,s1_location(:,2),Point_pos(Point_num,2));
+    diff1 = bsxfun(@minus,s1_location(:,1),Point_pos(i,1));
+    diff2 = bsxfun(@minus,s1_location(:,2),Point_pos(i,2));
     distance1 = sqrt(diff1.^2 + diff2.^2);
 
-    diff1 = bsxfun(@minus,s2_location(:,1),Point_pos(Point_num,1));
-    diff2 = bsxfun(@minus,s2_location(:,2),Point_pos(Point_num,2));
+    diff1 = bsxfun(@minus,s2_location(:,1),Point_pos(i,1));
+    diff2 = bsxfun(@minus,s2_location(:,2),Point_pos(i,2));
     distance2 = sqrt(diff1.^2 + diff2.^2);
 
     %lambdaVector = distance1 + distance2 - linksDistances;
@@ -70,18 +70,18 @@ for i = 1:Point_num
 	index = sub2ind(size(temp),links(:,1),links(:,2));
 	Z =[Z,temp(index)'];
 end
-clear index temp
+%clear index temp
 
 %Step 5:Merge lamda vector into lamda_standard.
 %Here we divide lamda evenly into L segments, because it makes the following caculation easier
 % and it almost have no influence on final results. 
 % step = (lamda_standard(L+1)-lamda_standard(L))/2
-step = 0.2;%step size should be choose carefully, here we choose 5 cetimeter
-lamda_standard = 0:step:2;
+step = 0.03;%step size should be choose carefully, here we choose 10 cetimeter
+lamda_standard = 0:step:1;
 L = length(lamda_standard);
 Z_standard = zeros(1,L);
 for i=1:L
-temp = (lamda<lamda_standard(i)+step/2)&(lamda>=lamda_standard(i)-step/2);
+temp = (lamda < (lamda_standard(i)+step/2))&(lamda >= (lamda_standard(i)-step/2));
 if sum(temp)~=0%avoid mean([])
 %plot(lamda_standard(i),Z(temp),'.r','MarkerSize',11)
 %hold on
@@ -95,7 +95,8 @@ Z_standard(temp) = [];
 plot(lamda_standard,Z_standard,'r-')
 xlabel('Lamda')
 ylabel('Attenuation')
-phi = 2;sigma_lamda = 0.5;
+phi = 1.8;sigma_lamda = 0.03;
 hold on
 plot(lamda_standard,phi*exp(-lamda_standard/(2*sigma_lamda)))
-mean(Z_standard - phi*exp(-lamda_standard/(2*sigma_lamda)))
+diff = Z_standard - phi*exp(-lamda_standard/(2*sigma_lamda));
+sqrt(var(diff))
