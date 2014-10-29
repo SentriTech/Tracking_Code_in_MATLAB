@@ -83,15 +83,15 @@ end
 % and it almost have no influence on final results. 
 % step = (lamda_standard(L+1)-lamda_standard(L))/2
 step = 0.03;%step size should be choose carefully(unit:meter)
-lamda_standard = 0:step:1;
+lamda_standard = 0:step:1;%initialize lamda_stabdard
 L = length(lamda_standard);
-Z_standard = zeros(1,L);
+Z_standard = zeros(1,L);%initialize variable
 for i=1:L
 temp = (lamda < (lamda_standard(i)+step/2))&(lamda >= (lamda_standard(i)-step/2));
 if sum(temp)~=0%avoid mean([])
 %plot(lamda_standard(i),Z(temp),'.r','MarkerSize',11)
 %hold on
-Z_standard(i) = mean(Z(temp));%average attenuation level.
+Z_standard(i) = mean(Z(temp));%average attenuation level in each standard lamda.
 end
 end
 temp = find(Z_standard==0);%find the index of zero value in Z_standard
