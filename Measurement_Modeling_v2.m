@@ -1,7 +1,9 @@
 clear;close;clc;
 %the aim of this script is to modeling measuerment model, 
-%or we can say to obtain 3 parameter:PHI, sigma_lamda and sigma_z
-%adjustable parament :step, 
+%or we can say to obtain 3 parameter:PHI, sigma_lamda and sigma_z.
+%Files in this directory are some kind of different from that in RealTimeMatlab directory,
+%although their name are exactly the same.
+
 %Step 1:Load settings.
 settings = Load_Settings();                                                
 
@@ -12,12 +14,14 @@ vacantFile_string = 'empty.csv';
 
 settings.rssEmpty = rssEmpty;
 settings.abnormalLink = abnormalLink;
-%Step 3:Read rss data with a person walking through each reference points.
+%Step 3:Read rss data when a person walking through each reference points.
 %Obtain rssObstruct
 Point_pos = settings.human_pos;
 [Point_num,~] = size((settings.human_pos));
 rssObstruct = zeros(settings.numNodes,settings.numNodes,Point_num);%Initialize rss data with a human stand in zigbee network
 
+%identify each reference point data by file name,then store it into a 3 dimension
+%matrix-----rssObstruct
 Allname=struct2cell(dir); 
 [~,n] = size(Allname);
 for j = 1:Point_num
@@ -37,8 +41,8 @@ for j = 1:Point_num
 end
 
 %Step 4:Caculate lamda and Z(attenuation).
-lamda = [];
-Z = [];
+lamda = [];%initialize lamda variable-----lamda
+Z = [];%initialize RSS attenuation variable-----Z
 sensor_network = Create_Network(settings);
 %remove abnormal links
 sensor_network.M = sensor_network.M - length(settings.abnormalLink);
@@ -51,6 +55,8 @@ linksDistances = sensor_network.d;
 
 s1_location = sensor_network.sensor_pos(sensor_network.links(:,1),:);%transmitte node position of each link
 s2_location = sensor_network.sensor_pos(sensor_network.links(:,2),:);%receive node position of each link.@wudan
+%caculate lamda value and RSS attenuation in each refernce point,actually,each reference
+%point consist of a lot of links .
 for i = 1:Point_num
     diff1 = bsxfun(@minus,s1_location(:,1),Point_pos(i,1));
     diff2 = bsxfun(@minus,s1_location(:,2),Point_pos(i,2));
@@ -71,7 +77,8 @@ for i = 1:Point_num
 end
 %clear index temp
 
-%Step 5:Merge lamda vector into lamda_standard.
+%Step 5:Merge lamda vector into lamda_standard,and at the same time,merge Z(attenuation)
+%into Z_standard.
 %Here we divide lamda evenly into L segments, because it makes the following caculation easier
 % and it almost have no influence on final results. 
 % step = (lamda_standard(L+1)-lamda_standard(L))/2
@@ -87,9 +94,9 @@ if sum(temp)~=0%avoid mean([])
 Z_standard(i) = mean(Z(temp));%average attenuation level.
 end
 end
-temp = find(Z_standard==0);%find zero part of Z_standard and eliminate it
-lamda_standard(temp) = [];
-Z_standard(temp) = [];
+temp = find(Z_standard==0);%find the index of zero value in Z_standard
+lamda_standard(temp) = [];%eliminate zero value
+Z_standard(temp) = [];%eliminate zero value
 %Step 6:Fitting the exponential curve,actually,i just manually do this
 plot(lamda_standard,Z_standard,'r-')
 xlabel('Lamda')
